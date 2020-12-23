@@ -141,7 +141,6 @@ export default {
 	}
 }
 .chat {
-	max-width: 78vw;
 	height: 100vh;
 	margin: auto;
 	background: var(--bg);

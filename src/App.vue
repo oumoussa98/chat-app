@@ -9,9 +9,10 @@
 <script>
 import ChatSideBar from "./components/ChatSideBar.vue";
 import Chat from "./components/Chat.vue";
+import Modal from "./components/Modal.vue";
 
 export default {
-	components: { ChatSideBar, Chat },
+	components: { ChatSideBar, Chat, Modal },
 	setup() {},
 };
 </script>

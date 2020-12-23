@@ -7,15 +7,18 @@
 				<div class="top">
 					<span>
 						abdelwahd
-						<span @click="showStatus" class="status">
+						<button @click="showStatus" class="status">
 							online
 							<ul v-if="show" class="status__dropdown">
-								<li class="go-offline">go offline</li>
-								<li class="go-offline">logout</li>
+								<li class="offline">offline</li>
+								<li>logout</li>
 							</ul>
-						</span>
+						</button>
 					</span>
-					<button class="new-conversation">New conversation</button>
+					<button @click="displayModal" class="new-conversation">
+						new conversation
+						<Modal />
+					</button>
 				</div>
 				<input class="search" type="search" placeholder="Search" />
 			</div>
@@ -50,9 +53,10 @@
 import { useStore } from "vuex";
 import { computed, ref } from "vue";
 import Arrow from "../components/svgs/Arrow.vue";
+import Modal from "../components/Modal.vue";
 
 export default {
-	components: { Arrow },
+	components: { Arrow, Modal },
 	setup() {
 		const store = useStore();
 		let chats = computed(() => store.getters.conversations);
@@ -70,6 +74,10 @@ export default {
 			if (show.value === true) return (show.value = false);
 			show.value = true;
 		};
+		const displayModal = () => {
+			const el = document.querySelector(".modal");
+			el.setAttribute("data-hide", "false");
+		};
 
 		return {
 			chats,
@@ -78,6 +86,7 @@ export default {
 			active,
 			showStatus,
 			show,
+			displayModal,
 		};
 	},
 };
@@ -120,13 +129,18 @@ export default {
 			margin: 2px 0 0 10px;
 			font-size: 12px;
 			position: relative;
+			border: none;
+			outline: none;
+			color: var(--color);
+			padding: 0 4px;
+			background: none;
 			cursor: pointer;
 			&::before {
 				content: "";
 				position: absolute;
 				width: 6px;
 				height: 6px;
-				left: -10px;
+				left: -8px;
 				bottom: 4px;
 				border-radius: 4px;
 				background: rgb(3, 141, 38);
@@ -134,7 +148,7 @@ export default {
 			&::after {
 				content: "";
 				position: absolute;
-				right: 0px;
+				right: -10px;
 				bottom: -4px;
 				border-top: 8px solid #363b44;
 				border-bottom: 6px solid transparent;
@@ -143,15 +157,29 @@ export default {
 			}
 			&__dropdown {
 				position: absolute;
-				left: -14px;
+				left: -12px;
 				top: 18px;
 				padding: 4px;
-				width: 140%;
+				width: 160%;
+				font-size: 13px;
 				background: var(--bg);
 				box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.4);
 				text-align: center;
 				li {
 					padding: 4px 0;
+				}
+				.offline {
+					position: relative;
+					&::before {
+						content: "";
+						position: absolute;
+						width: 6px;
+						height: 6px;
+						left: 0px;
+						top: 9px;
+						border-radius: 4px;
+						background: rgb(236, 5, 5);
+					}
 				}
 			}
 		}
