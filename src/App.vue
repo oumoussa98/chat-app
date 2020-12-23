@@ -19,8 +19,8 @@ export default {
 .clip-path {
 	clip-path: polygon(0 0, 100% 0%, 100% 53%, 0 100%);
 	background: var(--bg-secondary);
-	height: 70vh;
-	width: 100vw;
+	height: 70%;
+	width: 100%;
 	z-index: -1;
 	position: absolute;
 	top: 0;

@@ -98,6 +98,7 @@ export default {
 			height: 50px;
 			border-radius: 50%;
 			background: var(--bg);
+			align-self: center;
 			position: relative;
 		}
 		.expand {

@@ -385,7 +385,7 @@ export default {
 }
 @media screen and (max-width: 705px) {
 	.chat {
-		max-width: 98vw;
+		max-width: 100vw;
 		height: 100vh;
 		&__header {
 			.expand {
@@ -398,11 +398,6 @@ export default {
 	}
 	.burger-container {
 		display: inline-block;
-	}
-
-	#collapse {
-		max-width: 98vw;
-		height: 100vh;
 	}
 }
 </style>
