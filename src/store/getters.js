@@ -1,3 +1,4 @@
+import { reactive } from "vue";
 export const conversations = state => state.conversations;
 
 export const currentConversation = state => {
@@ -8,5 +9,10 @@ export const currentConversation = state => {
 
 export const currentMessages = state => {
 	const conversation = currentConversation(state);
-	return state.messages[conversation.id];
+	// return state.messages[conversation.id].messages;
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			resolve(state.messages[conversation.id].messages);
+		}, 2000);
+	});
 };
