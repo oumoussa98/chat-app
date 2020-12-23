@@ -1,26 +1,27 @@
 <template>
-	<div class="chat">
+	<Skeleton v-show="!dataLength" />
+	<div class="chat" v-show="dataLength">
 		<div class="chat__header">
-			<img src="../assets/avatar.svg" width="40" alt="Avatar" />
+			<div class="burger-container" @click="showSideBar">
+				<div role="button" class="burger-menu"></div>
+			</div>
+			<img src="../assets/images/avatar.svg" width="40" alt="Avatar" />
 			<div class="chat__header__info">
 				<h1>{{ name }}</h1>
-				<span class="circle"></span>
 				<span class="status">online</span>
 			</div>
-			<button @click="expand" class="expand">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-					<path
-						d="M24 0v10.999l-3.379-3.378-4.379 4.379-4.242-4.242 4.379-4.379-3.379-3.379h11zm-11.875 16.138l-4.242-4.242-4.504 4.483-3.379-3.378v10.999h11l-3.379-3.379 4.504-4.483z"
-					/>
-				</svg>
+			<button @click="collapse" class="expand">
+				<Shrink v-if="!collapsed" />
+				<Grow v-else />
 			</button>
+			<DarkLight class="dark-light" />
 		</div>
 		<div class="chat__messages">
-			<template v-for="(message, i) in messages" :key="i">
+			<template v-for="(message, i) in messages.data" :key="i">
 				<div v-if="message.received" class="received">{{ message.received }}<span></span></div>
 				<div v-if="message.sent" class="sent">{{ message.sent }}</div>
 			</template>
-			<div class="loading">
+			<div v-if="typing" class="loading">
 				<span class="span1"></span>
 				<span class="span2"></span>
 				<span class="span3"></span>
@@ -39,10 +40,15 @@
 </template>
 
 <script>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, reactive, watch } from "vue";
 import { useStore } from "vuex";
+import Grow from "../components/svgs/Grow.vue";
+import Shrink from "../components/svgs/Shrink.vue";
+import DarkLight from "../components/DarkLight.vue";
+import Skeleton from "../components/Skeleton.vue";
 
 export default {
+	components: { Grow, Shrink, DarkLight, Skeleton },
 	setup() {
 		const store = useStore();
 
@@ -50,13 +56,22 @@ export default {
 		const src = "./assets/avatar.svg";
 
 		let message = ref("");
+		let collapsed = ref(false);
+		let messages = reactive({});
+		let dataLength = ref(0);
 
-		let messages = computed(() => store.getters.currentMessages.messages);
+		const getData = async () => {
+			dataLength.value = 0;
+			messages.data;
+			messages.data = await store.getters.currentMessages;
+			if (messages.data.length) dataLength.value = messages.data.length;
+		};
+		getData();
 
 		const send = () => {
 			if (message.value) {
 				let obj = { sent: message.value };
-				messages.value.push(obj);
+				messages.data.push(obj);
 				message.value = "";
 				scrollBottom();
 			}
@@ -69,12 +84,24 @@ export default {
 				messagesContainer.scrollTop = messagesContainer.scrollHeight;
 			}, 0);
 		};
-		const expand = () => {
-			if (document.querySelector(".chat").id === "expand")
-				return (document.querySelector(".chat").id = "");
-			document.querySelector(".chat").id = "expand";
+		const collapse = () => {
+			const elements = document.querySelectorAll(".chat");
+			elements.forEach(el => {
+				if (el.id === "collapse") {
+					el.id = "";
+					collapsed.value = false;
+				} else {
+					el.id = "collapse";
+					collapsed.value = true;
+				}
+			});
 		};
+		const showSideBar = () => {
+			document.querySelector(".chat-side-bar").setAttribute("data-hide", "false");
+		};
+
 		onMounted(scrollBottom);
+		watch(name, getData);
 		return {
 			name,
 			src,
@@ -82,24 +109,42 @@ export default {
 			messages,
 			send,
 			scrollBottom,
-			expand,
+			collapse,
+			collapsed,
+			dataLength,
+			typing: false,
+			showSideBar,
 		};
 	},
 };
 </script>
 
-<style lang="scss">
-#expand {
-	max-width: 80%;
-	height: 100vh;
+<style lang="scss" scoped>
+#collapse {
+	max-width: 400px;
+	height: 90vh;
+	border-radius: 10px;
+	margin: auto;
+	box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);
+
+	.chat__header {
+		border-radius: 10px 10px 0 0;
+	}
+	.chat__footer {
+		border-radius: 0 0 10px 10px;
+		input {
+			border-radius: 0 0 0 10px;
+		}
+		button {
+			border-radius: 0 0 10px 0;
+		}
+	}
 }
 .chat {
-	color: #e0e0e0;
-	max-width: 400px;
+	max-width: 78vw;
+	height: 100vh;
 	margin: auto;
-	height: 90vh;
-	background: rgb(26, 26, 29);
-	border-radius: 10px;
+	background: var(--bg);
 	display: flex;
 	flex-direction: column;
 	flex-grow: 4;
@@ -108,33 +153,43 @@ export default {
 		width: 100%;
 		height: 10%;
 		margin: 0 auto;
-		background: #1b212b;
+		background: var(--bg-header);
 		padding: 10px;
 		z-index: 1;
 		display: flex;
-		border-radius: 10px 10px 0 0;
 		box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.4);
 		position: relative;
+
 		.expand {
+			align-self: center;
 			border: none;
 			background: none;
 			position: absolute;
 			right: 20px;
-			bottom: 16px;
 			cursor: pointer;
 			outline: none;
 			svg {
 				fill: #616161;
 			}
 		}
+		.dark-light {
+			align-self: center;
+			position: absolute;
+			right: 60px;
+		}
 		&__info {
+			align-self: center;
+			margin: 0 0 0 20px;
+
 			h1 {
-				font-size: 20px;
-				margin-left: 20px;
+				font-size: 18px;
+				margin: 0;
+				padding: 0;
 			}
 			.status {
-				font-size: 14px;
-				margin-left: 20px;
+				font-size: 12px;
+				margin: 0;
+				padding: 0;
 				position: relative;
 				&::before {
 					content: "";
@@ -142,7 +197,7 @@ export default {
 					width: 6px;
 					height: 6px;
 					right: -12px;
-					bottom: 2px;
+					bottom: 4px;
 					border-radius: 4px;
 					background: rgb(3, 141, 38);
 				}
@@ -151,7 +206,7 @@ export default {
 	}
 	&__messages {
 		width: 100%;
-		background: #1c232e;
+		background: var(--bg-messages-container);
 		opacity: 0.9;
 		height: 80%;
 		padding-top: 20px;
@@ -161,28 +216,59 @@ export default {
 	&__footer {
 		width: 100%;
 		height: 10%;
-		background: #191e27;
-		border-radius: 0 0 10px 10px;
+		background: var(--bg);
 		input {
 			width: 80%;
 			height: 100%;
-			background: #11151b;
+			background: var(--bg-secondary);
 			border: none;
 			outline: none;
 			padding: 10px;
-			border-radius: 0 0 0 10px;
-			color: white;
 			font-size: 15px;
+			color: var(--color);
 		}
 		button {
 			width: 20%;
-			padding: 23px 0 21px 0;
+			display: block;
+			float: right;
+			height: 100%;
 			background: #02721e;
-			color: white;
 			border: none;
-			border-radius: 0 0 10px 0;
 			cursor: pointer;
 			outline: none;
+		}
+	}
+}
+.burger-container {
+	display: none;
+	align-self: center;
+	cursor: pointer;
+	width: 32px;
+	margin: 0 20px 0 10px;
+	padding: 10px 0;
+	.burger-menu {
+		width: 30px;
+		height: 6px;
+		border-radius: 4px;
+		position: relative;
+		background: #616161;
+		&::after {
+			position: absolute;
+			content: "";
+			top: 10px;
+			width: 30px;
+			height: 6px;
+			border-radius: 4px;
+			background: #616161;
+		}
+		&::before {
+			position: absolute;
+			content: "";
+			top: -10px;
+			width: 30px;
+			height: 6px;
+			border-radius: 4px;
+			background: #616161;
 		}
 	}
 }
@@ -193,19 +279,20 @@ export default {
 	max-width: 70%;
 	padding: 10px;
 	border-radius: 0 10px 10px 10px;
-	background: #1313138e;
+	background: var(--received);
 	margin: 5px 0 8px 20px;
-	font-size: 13px;
+	font-size: 15px;
 	line-height: 1.4;
 	position: relative;
+	word-break: break-all;
 	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-	animation: bounce 0.9s;
+	animation: bounce 0.8s;
 
 	&::before {
 		content: "";
 		position: absolute;
 		top: -10px;
-		border-bottom: 10px solid #1313138e;
+		border-bottom: 10px solid var(--received);
 		left: 0;
 		border-right: 11px solid transparent;
 	}
@@ -217,17 +304,19 @@ export default {
 	padding: 10px;
 	margin: 5px 20px 8px 0;
 	position: relative;
-	font-size: 13px;
+	font-size: 15px;
+	color: white;
 	line-height: 1.4;
-	background: #03bd315b;
+	background: var(--sent);
 	border-radius: 10px 10px 0 10px;
-	animation: bounce 0.9s;
+	word-break: break-all;
+	animation: bounce 0.8s;
 	&::before {
 		content: "";
 		position: absolute;
 		bottom: -10px;
 		right: 0;
-		border-top: 10px solid #03bd315b;
+		border-top: 10px solid var(--sent);
 		border-left: 11px solid transparent;
 	}
 }
@@ -236,7 +325,7 @@ export default {
 	float: left;
 	padding: 6px 10px 7px 10px;
 	border-radius: 0 10px 10px 10px;
-	background: #1313138e;
+	background: var(--received);
 	margin: 0px 0 8px 20px;
 	position: relative;
 	width: 46px;
@@ -247,13 +336,16 @@ export default {
 		content: "";
 		position: absolute;
 		top: -10px;
-		border-bottom: 10px solid #1313138e;
+		border-bottom: 10px solid var(--received);
 		left: 0;
 		border-right: 11px solid transparent;
 	}
 	.span1,
 	.span2,
 	.span3 {
+		width: 6px;
+		height: 6px;
+		border-radius: 4px;
 		display: inline-block;
 		background: #3d3d3daf;
 		animation: loading 4s infinite;
@@ -261,34 +353,25 @@ export default {
 		animation-timing-function: ease-in;
 	}
 	.span1 {
-		width: 6px;
-		height: 6px;
-		margin: 0 0 7px 9px;
-		border-radius: 4px;
+		margin: 0 0 8px 9px;
 		position: relative;
 		animation-delay: 0.8s;
 	}
 	.span2 {
 		position: absolute;
-		width: 6px;
-		height: 6px;
-		border-radius: 4px;
 		left: 7px;
 		animation-delay: 0.6s;
 	}
 
 	.span3 {
 		position: absolute;
-		width: 6px;
-		height: 6px;
-		border-radius: 4px;
 		right: 9px;
 		animation-delay: 1s;
 	}
 }
 .chat__messages::-webkit-scrollbar-track {
 	border-radius: 10px;
-	background-color: #202835;
+	background-color: var(--bg-secondary);
 }
 
 .chat__messages::-webkit-scrollbar {
@@ -298,6 +381,28 @@ export default {
 
 .chat__messages::-webkit-scrollbar-thumb {
 	border-radius: 10px;
-	background: #10151d;
+	background: var(--bg-scroll);
+}
+@media screen and (max-width: 705px) {
+	.chat {
+		max-width: 98vw;
+		height: 100vh;
+		&__header {
+			.expand {
+				display: none;
+			}
+			.dark-light {
+				right: 20px;
+			}
+		}
+	}
+	.burger-container {
+		display: inline-block;
+	}
+
+	#collapse {
+		max-width: 98vw;
+		height: 100vh;
+	}
 }
 </style>
