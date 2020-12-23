@@ -12,7 +12,7 @@
 			</button>
 			<DarkLight class="dark-light" />
 		</div>
-		<div class="chat__messages">
+		<div class="chat__messages__skeleton">
 			<template v-for="i in [1, 2, 3, 4, 5]" :key="i">
 				<div class="received"><span></span></div>
 				<div class="sent"></div>
@@ -140,9 +140,9 @@ export default {
 			}
 		}
 	}
-	&__messages {
+	&__messages__skeleton {
 		width: 100%;
-		background: var(--bg-messages-container);
+		background: var(--bg-messages__skeleton-container);
 		opacity: 0.9;
 		height: 80%;
 		padding-top: 20px;
@@ -243,17 +243,17 @@ export default {
 		animation: shimmerGreen 1s infinite;
 	}
 }
-.chat__messages::-webkit-scrollbar-track {
+.chat__messages__skeleton::-webkit-scrollbar-track {
 	border-radius: 10px;
 	background-color: var(--bg-secondary);
 }
 
-.chat__messages::-webkit-scrollbar {
+.chat__messages__skeleton::-webkit-scrollbar {
 	width: 8px;
 	background-color: #202530;
 }
 
-.chat__messages::-webkit-scrollbar-thumb {
+.chat__messages__skeleton::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	background: var(--bg-scroll);
 }
