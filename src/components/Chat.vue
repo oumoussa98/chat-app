@@ -21,7 +21,7 @@
 				<div v-if="message.received" class="received">{{ message.received }}<span></span></div>
 				<div v-if="message.sent" class="sent">{{ message.sent }}</div>
 			</template>
-			<div v-if="typing" class="loading">
+			<div v-if="loading" class="loading">
 				<span class="span1"></span>
 				<span class="span2"></span>
 				<span class="span3"></span>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { onMounted, ref, computed, reactive, watch } from "vue";
+import { onMounted, ref, computed, reactive, watch, onUpdated } from "vue";
 import { useStore } from "vuex";
 import Grow from "../components/svgs/Grow.vue";
 import Shrink from "../components/svgs/Shrink.vue";
@@ -68,12 +68,20 @@ export default {
 		};
 		getData();
 
+		let loading = ref(false);
 		const send = () => {
 			if (message.value) {
 				let obj = { sent: message.value };
 				messages.data.push(obj);
 				message.value = "";
 				scrollBottom();
+				let obj2 = { received: "Glad to see you here some cool stuff coming soon" };
+				loading.value = true;
+				setTimeout(() => {
+					loading.value = false;
+					messages.data.push(obj2);
+					scrollBottom();
+				}, 3000);
 			}
 			return;
 		};
@@ -101,6 +109,7 @@ export default {
 		};
 
 		onMounted(scrollBottom);
+		onUpdated(scrollBottom);
 		watch(name, getData);
 		return {
 			name,
@@ -112,8 +121,8 @@ export default {
 			collapse,
 			collapsed,
 			dataLength,
-			typing: false,
 			showSideBar,
+			loading,
 		};
 	},
 };
