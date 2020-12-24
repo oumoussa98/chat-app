@@ -35,7 +35,7 @@ export default {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: 1;
+	z-index: 2;
 	animation: modalTransition 0.4s linear;
 }
 .modal-overlay {
@@ -44,7 +44,7 @@ export default {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: 2;
+	z-index: 3;
 	background: rgba(0, 0, 0, 0.4);
 }
 .modal[data-hide="true"] {
@@ -56,15 +56,16 @@ export default {
 
 .modal-content {
 	width: 600px;
-	height: 400px;
+	height: 60vh;
+	margin: 0 10px;
 	background: var(--bg);
-	z-index: 3;
 	box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.4);
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	z-index: 4;
 }
 .close {
 	position: absolute;

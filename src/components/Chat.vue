@@ -142,6 +142,7 @@ export default {
 }
 .chat {
 	height: 100vh;
+	max-width: 100vw;
 	margin: auto;
 	background: var(--bg);
 	display: flex;
@@ -283,7 +284,7 @@ export default {
 	font-size: 15px;
 	line-height: 1.4;
 	position: relative;
-	word-break: break-all;
+	word-wrap: break-word;
 	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 	animation: bounce 0.8s;
 
@@ -308,7 +309,7 @@ export default {
 	line-height: 1.4;
 	background: var(--sent);
 	border-radius: 10px 10px 0 10px;
-	word-break: break-all;
+	word-wrap: break-word;
 	animation: bounce 0.8s;
 	&::before {
 		content: "";

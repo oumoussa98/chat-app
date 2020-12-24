@@ -312,4 +312,10 @@ export default {
 		}
 	}
 }
+@media screen and (max-width: 350px) {
+	.chat-side-bar {
+		min-width: 250px;
+		width: 250px;
+	}
+}
 </style>
