@@ -187,7 +187,7 @@ export default {
 			width: 50%;
 			padding: 10px;
 			float: right;
-			background: #06722a;
+			background: #149159;
 			border: none;
 			margin: 8px 4px 0 0;
 			border-radius: 8px;

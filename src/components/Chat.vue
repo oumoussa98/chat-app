@@ -232,7 +232,7 @@ export default {
 			display: block;
 			float: right;
 			height: 100%;
-			background: #02721e;
+			background: #04693c;
 			border: none;
 			cursor: pointer;
 			outline: none;
